@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"html/template"
 	"fmt"
 	r "github.com/dancannon/gorethink"
 )
@@ -70,19 +69,6 @@ func answerHandler(w http.ResponseWriter, res *http.Request) {
 		"Author": "Haruki Murakami",
 	})
 
-}
-
-
-func renderTemplate(w http.ResponseWriter, tmpl string, vars interface{}) {
-	t, err := template.ParseFiles(tmpl + ".html")
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-	err = t.Execute(w, vars)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
 }
 
 func main() {
