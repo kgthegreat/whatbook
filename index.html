@@ -17,27 +17,39 @@
       </nav>
       
       <div class="page-header">
-        <h3>Take the quiz <small>and find your next read</small></h3>
+        <h3>Take the quiz <small>and discover your next read</small></h3>
       </div>
 
-
-      <div class="col-md-5 col-md-offset-4">
-        <div>
-          <img src="/images/coetzee.jpg" alt="Youth">
+      <div class="row">
+        <div class="col-md-5 col-md-offset-2">
+          <img src="{{.ImageUrl}}" alt="{{.Title}}" width=300 height=450>
+        </div>
+        <div class="col-md-3">
           <div class="caption">
-            <h4>Youth <small>J.M. Coetzee</small></h4>
-            <p>Youth knows no bound</p>
-            <div class="btn-group btn-group-sm" role="group" aria-label="...">
-              <button type="button" class="btn btn-success"> 
-                <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> It's Great</button>
-              <button type="button" class="btn btn-default">                  
-                <span class="glyphicon glyphicon-stop" aria-hidden="true"></span> Can't Say</button>
-              <button type="button" class="btn btn-danger">                  
-                <span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> Didn't like</button>
-            </div>
+            <h4>{{.Title}} <small>{{.Author}}</small></h4>
+            <p>{{.Oneliner}}</p>
+            <form action="/answer" method="post">
+              <div class="radio">
+                <label>
+                  <input name="yes" type="radio"> <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> I like it
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input name="neutral" type="radio"> Can't say
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input name="no" type="radio"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> Not my taste
+                </label>
+              </div>
+              <button type="submit" class="btn btn-success btn-sm">Next</button>
+            </form>
           </div>
         </div>
       </div>
     </div>
-  </body>
+</div>
+</body>
 </html>
