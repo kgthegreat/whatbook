@@ -43,10 +43,10 @@ func StartServer(server *http.Server) {
 }
 
 func initRouting() {
-	cssHandler := http.FileServer(http.Dir("./css/"))
-//	jsHandler := http.FileServer(http.Dir("./js/"))
-	imagesHandler := http.FileServer(http.Dir("./images/"))
-	fontsHandler := http.FileServer(http.Dir("./fonts/"))
+	cssHandler := http.FileServer(http.Dir("./static/css/"))
+//	jsHandler := http.FileServer(http.Dir("./static/js/"))
+	imagesHandler := http.FileServer(http.Dir("./static/images/"))
+	fontsHandler := http.FileServer(http.Dir("./static/fonts/"))
 
 	http.Handle("/css/", http.StripPrefix("/css/", cssHandler))
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", fontsHandler))

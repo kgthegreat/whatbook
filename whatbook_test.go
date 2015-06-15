@@ -4,7 +4,6 @@ import (
 	"testing"
 	"net/http"
 	"net/http/httptest"
-	"fmt"
 )
 
 func TestCanary(t *testing.T) {
