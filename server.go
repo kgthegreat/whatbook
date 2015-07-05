@@ -97,4 +97,3 @@ func answerHandler(w http.ResponseWriter, res *http.Request) {
 	})
 
 }
-
