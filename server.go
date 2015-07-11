@@ -55,26 +55,27 @@ func initRouting() {
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/answer", answerHandler)
+	http.HandleFunc("/bulkupload", bulkUploadHandler)
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
+func indexHandler(w http.ResponseWriter, req *http.Request) {
 	renderTemplate(w, "index", map[string]interface{}{
 		"ImageUrl": "/images/coetzee.jpg",
 		"Title": "Youth",
 		"Author": "J.M. Coetzee",
+		"Blurb": "The second installment of J. M. Coetzee's fictionalized memoir explores a young man's struggle to experience life to its full intensity and transform it into art.",
 	})
 
 } 
 
-func answerHandler(w http.ResponseWriter, res *http.Request) {
+func answerHandler(w http.ResponseWriter, req *http.Request) {
 	var preference string
-	if res.FormValue("yes") == "on" {
-		preference = "yes"
-		fmt.Println("In if")
-	} else if res.FormValue("neutral") == "on" {
-		preference = "neutral"
-	} else if res.FormValue("no") == "on" {
-		preference = "no"
+	if req.FormValue("7") == "on" {
+		preference = "7"
+	} else if req.FormValue("6") == "on" {
+		preference = "6"
+	} else if req.FormValue("5") == "on" {
+		preference = "5"
 	}
 
 	var data = map[string]interface{}{
