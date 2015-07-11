@@ -21,27 +21,49 @@
       </div>
 
       <div class="row">
-        <div class="col-md-5 col-md-offset-2">
+        <div class="col-md-5 col-md-offset-1">
           <img src="{{.ImageUrl}}" alt="{{.Title}}" width=300 height=450>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-5">
           <div class="caption">
             <h4>{{.Title}} <small>{{.Author}}</small></h4>
-            <p>The second installment of J. M. Coetzee's fictionalized memoir explores a young man's struggle to experience life to its full intensity and transform it into art. </p>
+            <p>{{.Blurb}}</p>
             <form action="/answer" method="post">
               <div class="radio">
                 <label>
-                  <input name="yes" type="radio"> <span class="glyphicon glyphicon-thumbs-up" aria-hidden="true"></span> I have read it
+                  <input name="7" type="radio"> I have read it and it was amazing
                 </label>
               </div>
               <div class="radio">
                 <label>
-                  <input name="neutral" type="radio"> Can't say
+                  <input name="6" type="radio"> I have read it and I liked it
+                </label>
+              </div>
+
+              <div class="radio">
+                <label>
+                  <input name="5" type="radio"> I have read it and it was OK
                 </label>
               </div>
               <div class="radio">
                 <label>
-                  <input name="no" type="radio"><span class="glyphicon glyphicon-thumbs-down" aria-hidden="true"></span> Not my taste
+                  <input name="4" type="radio"> I have read it and I did not like it
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input name="3" type="radio"> I have not read it but it sounds interesting
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input name="2" type="radio"> I have not read it and cannot say
+                </label>
+              </div>
+
+              <div class="radio">
+                <label>
+                  <input name="1" type="radio"> I have not read it and not interested
                 </label>
               </div>
               <button type="submit" class="btn btn-success btn-sm">Next</button>
