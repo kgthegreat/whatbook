@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 	r "github.com/dancannon/gorethink"
+	"strings"
 )
 
 func bulkUploadHandler(w http.ResponseWriter, res *http.Request) {
@@ -26,7 +27,7 @@ func bulkUploadHandler(w http.ResponseWriter, res *http.Request) {
 	}
 
 	var oneRecord Book
-	var genre []string
+//	var genre []string
 
 	for _, each := range csvData {
 		oneRecord.Title = each[0]
@@ -34,7 +35,7 @@ func bulkUploadHandler(w http.ResponseWriter, res *http.Request) {
 		oneRecord.Iscale, _ = strconv.ParseFloat(each[2], 32)
 		lscale, _ := strconv.ParseFloat(each[3], 32)
 		oneRecord.Lscale = 2*lscale
-		oneRecord.Genre = append(genre, each[4])
+		oneRecord.Genre = strings.ToLower(each[4])
 		oneRecord.Created = time.Now()
 		_, err := r.Table("books").Insert(oneRecord).RunWrite(session)
 		fmt.Println("Writing %v", oneRecord.Title)

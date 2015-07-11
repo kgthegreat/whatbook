@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">  
+    <title>WhatBook</title>
+    <meta name="description" content="What book should I read?">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="col-md-8 col-md-offset-2">
+      <nav role="navbar" class="navbar navbar-default">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">                
+            <span class="glyphicon glyphicon-book" aria-hidden="true"></span> WhatBook</a>
+        </div>
+      </nav>
+      
+      <div class="page-header">
+        <h3>Take the quiz <small>and discover your next read</small></h3>
+      </div>
+
+      <div class="row">
+        <div class="col-md-5 col-md-offset-1">
+          <img src="#" alt="{{.Title}}" width=300 height=450>
+        </div>
+        <div class="col-md-5">
+          <div class="caption">
+            <h4>{{.Title}} <small>{{.Author}}</small></h4>
+            <form action="/answer" method="post">
+              <input name="id" type="hidden" value="{{.Id}}">
+              <input name="genre" type="hidden" value="{{.Genre}}">
+              <div class="radio">
+                <label>
+                  <input name="7" type="radio"> I have read it and it was amazing
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input name="6" type="radio"> I have read it and I liked it
+                </label>
+              </div>
+
+              <div class="radio">
+                <label>
+                  <input name="5" type="radio"> I have read it and it was OK
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input name="4" type="radio"> I have read it and I did not like it
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input name="3" type="radio"> I have not read it but it sounds interesting
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input name="2" type="radio"> I have not read it and cannot say
+                </label>
+              </div>
+
+              <div class="radio">
+                <label>
+                  <input name="1" type="radio"> I have not read it and not interested
+                </label>
+              </div>
+              <button type="submit" class="btn btn-success btn-sm">Next</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+</body>
+</html>

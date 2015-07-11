@@ -10,6 +10,6 @@ type Book struct {
 	Author  string
 	Iscale  float64
 	Lscale  float64
-	Genre   []string
+	Genre   string
 	Created time.Time
 }
