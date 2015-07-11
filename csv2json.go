@@ -2,38 +2,30 @@ package main
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
 	"net/http"
 	"time"
+	r "github.com/dancannon/gorethink"
 )
 
 func bulkUploadHandler(w http.ResponseWriter, res *http.Request) {
-	// read data from CSV file
 
 	csvFile, err := os.Open("./data.csv")
-
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	defer csvFile.Close()
-
 	reader := csv.NewReader(csvFile)
-
 	reader.FieldsPerRecord = -1
-
 	csvData, err := reader.ReadAll()
-
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	var oneRecord Book
-	var allRecords []Book
 	var genre []string
 
 	for _, each := range csvData {
@@ -44,37 +36,13 @@ func bulkUploadHandler(w http.ResponseWriter, res *http.Request) {
 		oneRecord.Lscale = 2*lscale
 		oneRecord.Genre = append(genre, each[4])
 		oneRecord.Created = time.Now()
-/*		_, err := r.Table("books").Insert(one).RunWrite(session)
+		_, err := r.Table("books").Insert(oneRecord).RunWrite(session)
+		fmt.Println("Writing %v", oneRecord.Title)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
-		}*/
+		}
 		
-		allRecords = append(allRecords, oneRecord)
 	}
-
-
-	jsondata, err := json.Marshal(allRecords) // convert to JSON
-
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	// sanity check
-	// NOTE : You can stream the JSON data to http service as well instead of saving to file
-	fmt.Println(string(jsondata))
-
-	// now write to JSON file
-
-	jsonFile, err := os.Create("./data.json")
-
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer jsonFile.Close()
-
-	jsonFile.Write(jsondata)
-	jsonFile.Close()
 	fmt.Fprintf(w, "All Uploaded")
 }
