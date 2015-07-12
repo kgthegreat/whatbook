@@ -18,10 +18,23 @@
       </nav>
       
       <div class="page-header">
-        <h3>Take the quiz <small>and discover your next read</small></h3>
+        <h3>Here is our recommendation <small>enjoy</small></h3>
       </div>
 
-      <a class="btn btn-primary" href="/quiz" role="button">Take the Quiz!</a>
+      <div class="row">
+        <div class="col-md-5 col-md-offset-1">
+          <img src="#" alt="{{.Title}}" width=300 height=450>
+        </div>
+        <div class="col-md-5">
+          <div class="caption">
+            <h4>{{.Title}} <small>{{.Author}}</small></h4>
+            <a class="btn btn-primary" href="/quiz" role="button">Start the Quiz Again!</a>
+          </div>
+        </div>
+      </div>
+
+
+
 
     </div>
   </body>

@@ -6,6 +6,7 @@
     <meta name="description" content="What book should I read?">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   </head>
   <body>
     <div class="col-md-8 col-md-offset-2">
@@ -26,10 +27,11 @@
         </div>
         <div class="col-md-5">
           <div class="caption">
-            <h4>{{.Title}} <small>{{.Author}}</small></h4>
+            <h4>{{.Title}} <small>{{.Author}}<span class="label label-success">{{.Genre}}</span></small></h4>
             <form action="/answer" method="post">
               <input name="id" type="hidden" value="{{.Id}}">
               <input name="genre" type="hidden" value="{{.Genre}}">
+              <input name="title" type="hidden" value="{{.Title}}">
               <div class="radio">
                 <label>
                   <input name="7" type="radio"> I have read it and it was amazing

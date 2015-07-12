@@ -4,7 +4,6 @@ import (
 	r "github.com/dancannon/gorethink"
 	"log"
 	"net/http"
-	"fmt"
 	"math/rand"
 	"math"
 )
@@ -13,7 +12,7 @@ var (
 	session *r.Session
 	lscale = 7
 	iscale = 5
-	nextGenre = "mystery"
+	nextGenre = "culture"
 	genreMap = map[string]int{
 		"adventure": 0,
 		"thriller": 1,
@@ -60,6 +59,9 @@ var (
 		"fantasy", 
 		"magic realism", 
 		"science fiction"}
+
+	iteration = 1
+	//displayedBooks []string
 )
 
 func init() {
@@ -77,7 +79,23 @@ func init() {
 
 func NewServer(addr string) *http.Server {
 	// Setup router
-	initRouting()
+//	initRouting()
+
+	cssHandler := http.FileServer(http.Dir("./static/css/"))
+//	jsHandler := http.FileServer(http.Dir("./static/js/"))
+	imagesHandler := http.FileServer(http.Dir("./static/images/"))
+	fontsHandler := http.FileServer(http.Dir("./static/fonts/"))
+
+	http.Handle("/css/", http.StripPrefix("/css/", cssHandler))
+	http.Handle("/fonts/", http.StripPrefix("/fonts/", fontsHandler))
+//	http.Handle("/js/", http.StripPrefix("/js/", jsHandler))
+	http.Handle("/images/", http.StripPrefix("/images/", imagesHandler))
+
+	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/quiz", quizHandler)
+	http.HandleFunc("/answer", answerHandler)
+	http.HandleFunc("/recommendation", recommendationHandler)
+	http.HandleFunc("/bulkupload", bulkUploadHandler)
 
 	// Create and start server
 	return &http.Server{
@@ -93,43 +111,57 @@ func StartServer(server *http.Server) {
 	}
 }
 
-func initRouting() {
-	cssHandler := http.FileServer(http.Dir("./static/css/"))
-//	jsHandler := http.FileServer(http.Dir("./static/js/"))
-	imagesHandler := http.FileServer(http.Dir("./static/images/"))
-	fontsHandler := http.FileServer(http.Dir("./static/fonts/"))
-
-	http.Handle("/css/", http.StripPrefix("/css/", cssHandler))
-	http.Handle("/fonts/", http.StripPrefix("/fonts/", fontsHandler))
-//	http.Handle("/js/", http.StripPrefix("/js/", jsHandler))
-	http.Handle("/images/", http.StripPrefix("/images/", imagesHandler))
-
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/quiz", quizHandler)
-	http.HandleFunc("/answer", answerHandler)
-	http.HandleFunc("/bulkupload", bulkUploadHandler)
-}
-
 func quizHandler(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("The book from next genre is, ", nextGenre)
-	var books []Book
-	query := r.Table("books").Filter(r.Row.Field("Iscale").Eq(iscale).And(r.Row.Field("Lscale").Ge(lscale)).And(r.Row.Field("Genre").Eq(nextGenre)))
-	result, err := query.Run(session)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	books := getBooks()
+	for len(books) == 0 {
+		log.Println("DB does not have such a book. Trying Again..")
+		nextGenre = similarGenre(nextGenre)
+		books = getBooks()
 	}
-	err = result.All(&books)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
+	
+	log.Printf("Successfully got %v books\n", len(books))
 	book := books[rand.Intn(len(books))]
+	log.Printf("We are showing %v of %v and iscale %v as question %v\n", book.Title, book.Genre, book.Iscale, iteration )
+//	iteration = iteration + 1
 	renderTemplate(w, "quiz", book)
 
 } 
 
+func recommendationHandler(w http.ResponseWriter, req *http.Request) {
+	iscale = iscale + 1
+	books := getBooks()
+	for len(books) == 0 {
+		log.Println("DB does not have such a book for rec. Trying Again..")
+		nextGenre = similarGenre(nextGenre)
+		books = getBooks()
+	}
+	log.Println("Successfully got a book for rec")
+	book := books[rand.Intn(len(books))]
+	log.Printf("We are recommending %v of %v and iscale %v\n", book.Title, book.Genre, book.Iscale )
+	iscale = 5
+	nextGenre = "culture"
+	iteration = 1
+	renderTemplate(w, "recommendation", book)
+}
+
+func getBooks() []Book {
+	log.Printf("Trying to get a book of genre %s and iscale %v \n", nextGenre, iscale)
+	var books []Book
+	query := r.Table("books").Filter(r.Row.Field("Iscale").Eq(iscale).And(r.Row.Field("Lscale").Ge(lscale)).And(r.Row.Field("Genre").Eq(nextGenre)))
+	result, err := query.Run(session)
+	if err != nil {
+//		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println(err.Error())
+//		return
+	}
+	err = result.All(&books)
+	if err != nil {
+//		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println(err.Error())
+//		return
+	}
+	return books
+}
 func indexHandler(w http.ResponseWriter, req *http.Request) {
 	var empty []string
 	renderTemplate(w, "index", empty)
@@ -139,6 +171,7 @@ func answerHandler(w http.ResponseWriter, req *http.Request) {
 	var preference string
 	id := req.FormValue("id")
 	genre := req.FormValue("genre")
+	title := req.FormValue("title")
 	if req.FormValue("7") == "on" {
 		nextGenre = similarGenre(genre)
 		iscale = iscale + 1
@@ -157,7 +190,7 @@ func answerHandler(w http.ResponseWriter, req *http.Request) {
 		preference = "4"
 	} else if req.FormValue("3") == "on" {
 		nextGenre = similarGenre(genre)
-		iscale = iscale - 1
+	//	iscale = iscale - 1
 		preference = "3"
 	} else if req.FormValue("2") == "on" {
 		nextGenre = changeGenre(genre)
@@ -165,24 +198,28 @@ func answerHandler(w http.ResponseWriter, req *http.Request) {
 		preference = "2"
 	} else if req.FormValue("1") == "on" {
 		nextGenre = changeGenre(genre)
-		iscale = iscale - 1
+//		iscale = iscale - 1
 		preference = "1"
 	}
-	fmt.Println("book id", req.FormValue("id"))
+
+	log.Printf("**** User said %s for %s ****\n", preference, title )
+
 	var data = map[string]interface{}{
 		"book_id": id,
 		"preference": preference,
 	}
-
-	result, err := r.Table("answers").Insert(data).RunWrite(session)
+	
+//	displayedBook = append(displayedBook, id)
+	_, err := r.Table("answers").Insert(data).RunWrite(session)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
-	fmt.Println("*** Insert result: ***")
-	fmt.Println("*** Insert result: ** %v", result)
-
-	http.Redirect(w, req, "/quiz", http.StatusFound)
-
+	iteration = iteration + 1
+	if iteration <= 10 {
+		http.Redirect(w, req, "/quiz", http.StatusFound)
+	} else {
+		http.Redirect(w, req, "/recommendation", http.StatusFound)
+	}
 }
 
 func changeGenre(genre string) string {
