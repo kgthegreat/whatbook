@@ -1,5 +1,7 @@
 main
 static/images
+static/fonts
+static/css
 whatbook
 data.csv
 data.json
