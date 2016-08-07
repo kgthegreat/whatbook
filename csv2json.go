@@ -7,7 +7,8 @@ import (
 	"strconv"
 	"net/http"
 	"time"
-	r "github.com/dancannon/gorethink"
+	r "gopkg.in/dancannon/gorethink.v2"
+	//r "github.com/dancannon/gorethink"
 	"strings"
 )
 

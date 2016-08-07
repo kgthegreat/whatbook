@@ -1,7 +1,8 @@
 package main
 
 import (
-	r "github.com/dancannon/gorethink"
+	r "gopkg.in/dancannon/gorethink.v2"
+	//r "github.com/dancannon/gorethink"
 	"log"
 	"net/http"
 	"math/rand"
@@ -113,17 +114,27 @@ func StartServer(server *http.Server) {
 
 func quizHandler(w http.ResponseWriter, req *http.Request) {
 	books := getBooks()
-	for len(books) == 0 {
+	counter := 0
+	var empty []string
+	for(len(books) == 0 && counter < 10) {
 		log.Println("DB does not have such a book. Trying Again..")
 		nextGenre = similarGenre(nextGenre)
 		books = getBooks()
+		counter = counter + 1
 	}
 	
 	log.Printf("Successfully got %v books\n", len(books))
-	book := books[rand.Intn(len(books))]
-	log.Printf("We are showing %v of %v and iscale %v as question %v\n", book.Title, book.Genre, book.Iscale, iteration )
+	if len(books) != 0 {
+		book := books[rand.Intn(len(books))]
+		log.Printf("We are showing %v of %v and iscale %v as question %v\n", book.Title, book.Genre, book.Iscale, iteration )
+		renderTemplate(w, "quiz", book)
+	} else {
+		
+		renderTemplate(w, "error", empty)
+	}
+
 //	iteration = iteration + 1
-	renderTemplate(w, "quiz", book)
+
 
 } 
 
