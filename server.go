@@ -97,6 +97,7 @@ func NewServer(addr string) *http.Server {
 	http.HandleFunc("/answer", answerHandler)
 	http.HandleFunc("/recommendation", recommendationHandler)
 	http.HandleFunc("/bulkupload", bulkUploadHandler)
+	//http.HandleFunc("/error", errorHandler)
 
 	// Create and start server
 	return &http.Server{
@@ -112,14 +113,25 @@ func StartServer(server *http.Server) {
 	}
 }
 
+
 func quizHandler(w http.ResponseWriter, req *http.Request) {
-	books := getBooks()
+	log.Println("Inside qh")
+	books, err := getBooks()
+	if err != nil {
+		log.Println("Inside qh 1 err")
+		http.Error(w, err.Error(), 500)
+		return
+	}
 	counter := 0
-	var empty []string
 	for(len(books) == 0 && counter < 10) {
 		log.Println("DB does not have such a book. Trying Again..")
 		nextGenre = similarGenre(nextGenre)
-		books = getBooks()
+		books, err = getBooks()
+		if err != nil {
+			log.Println("Inside qh 2 err")
+			log.Println(err)
+			http.Redirect(w, req, "/error", 301)
+		}
 		counter = counter + 1
 	}
 	
@@ -128,9 +140,10 @@ func quizHandler(w http.ResponseWriter, req *http.Request) {
 		book := books[rand.Intn(len(books))]
 		log.Printf("We are showing %v of %v and iscale %v as question %v\n", book.Title, book.Genre, book.Iscale, iteration )
 		renderTemplate(w, "quiz", book)
+
 	} else {
-		
-		renderTemplate(w, "error", empty)
+		http.Redirect(w, req, "/error", 301)
+//		
 	}
 
 //	iteration = iteration + 1
@@ -140,11 +153,21 @@ func quizHandler(w http.ResponseWriter, req *http.Request) {
 
 func recommendationHandler(w http.ResponseWriter, req *http.Request) {
 	iscale = iscale + 1
-	books := getBooks()
+	books, err := getBooks()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), 500)
+	}
+
 	for len(books) == 0 {
 		log.Println("DB does not have such a book for rec. Trying Again..")
 		nextGenre = similarGenre(nextGenre)
-		books = getBooks()
+		books, err = getBooks()
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), 500)
+		}
+
 	}
 	log.Println("Successfully got a book for rec")
 	book := books[rand.Intn(len(books))]
@@ -155,25 +178,24 @@ func recommendationHandler(w http.ResponseWriter, req *http.Request) {
 	renderTemplate(w, "recommendation", book)
 }
 
-func getBooks() []Book {
+func getBooks() ([]Book, error) {
 	log.Printf("Trying to get a book of genre %s and iscale %v \n", nextGenre, iscale)
 	var books []Book
 	query := r.Table("books").Filter(r.Row.Field("Iscale").Eq(iscale).And(r.Row.Field("Lscale").Ge(lscale)).And(r.Row.Field("Genre").Eq(nextGenre)))
 	result, err := query.Run(session)
 	if err != nil {
-//		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println(err.Error())
-//		return
+		log.Println(err)
+		return books, err
 	}
 	err = result.All(&books)
 	if err != nil {
-//		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println(err.Error())
-//		return
+		log.Println(err)
+		return books, err
 	}
-	return books
+	return books, nil
 }
 func indexHandler(w http.ResponseWriter, req *http.Request) {
+	log.Println("Inside ih")
 	var empty []string
 	renderTemplate(w, "index", empty)
 }
