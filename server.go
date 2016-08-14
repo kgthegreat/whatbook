@@ -130,7 +130,7 @@ func quizHandler(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			log.Println("Inside qh 2 err")
 			log.Println(err)
-			http.Redirect(w, req, "/error", 301)
+			http.Error(w, err.Error(), 500)
 		}
 		counter = counter + 1
 	}
@@ -142,7 +142,7 @@ func quizHandler(w http.ResponseWriter, req *http.Request) {
 		renderTemplate(w, "quiz", book)
 
 	} else {
-		http.Redirect(w, req, "/error", 301)
+		http.Error(w, err.Error(), 500)
 //		
 	}
 

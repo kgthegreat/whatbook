@@ -7,10 +7,11 @@ import (
 func main() {
 
 	var (
-		addr string = "localhost:8081"
+		addr string = ":3000"
+//		addr string = ":3000"
 	)
 
-	flag.StringVar(&addr, "addr", "localhost:8081", "")
+	flag.StringVar(&addr, "addr", ":3000", "")
 	flag.Parse()
 
 	server := NewServer(addr)
