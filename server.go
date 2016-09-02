@@ -7,9 +7,13 @@ import (
 	"net/http"
 	"math/rand"
 	"math"
+	"github.com/mrjones/oauth"
+	"github.com/kgthegreat/whatbook/gorego"
 )
 
 var (
+	requestToken *oauth.RequestToken
+	accessToken *oauth.AccessToken
 	session *r.Session
 	lscale = 7
 	iscale = 5
@@ -97,6 +101,13 @@ func NewServer(addr string) *http.Server {
 	http.HandleFunc("/answer", answerHandler)
 	http.HandleFunc("/recommendation", recommendationHandler)
 	http.HandleFunc("/bulkupload", bulkUploadHandler)
+
+
+	http.HandleFunc("/grauth", grAuthHandler)
+	http.HandleFunc("/grcallback", grCallbackHandler)
+	http.HandleFunc("/grwelcome", grWelcomeHandler)
+	http.HandleFunc("/grlist", grListHandler)
+
 	//http.HandleFunc("/error", errorHandler)
 
 	// Create and start server
@@ -111,6 +122,41 @@ func StartServer(server *http.Server) {
 	if err != nil {
 		log.Fatalln("Error: %v", err)
 	}
+}
+
+func grListHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Inside glh")
+	log.Println("This is the userid which we have in glh " +r.FormValue("gruserid") )
+	response := gorego.GetReviewList(r.FormValue("gruserid"), 200)
+
+	renderTemplate(w, "gr_list", response)
+}
+
+
+func grWelcomeHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Inside gwh")
+	renderTemplate(w, "gr_welcome", map[string]string{
+		"GRUsername": r.FormValue("grusername"),
+		"GRUserid": r.FormValue("gruserid"),
+	})
+}
+
+func grAuthHandler(w http.ResponseWriter, r *http.Request) {
+	_requestToken, auth_url := gorego.GetAuthorisationURL()
+	requestToken = _requestToken
+
+	http.Redirect(w, r, auth_url, http.StatusTemporaryRedirect)
+
+}
+
+func grCallbackHandler(w http.ResponseWriter, r *http.Request) {
+	
+	verificationCode := r.FormValue("oauth_token")
+	accessToken = gorego.GetAccessToken(verificationCode, requestToken)
+        user := gorego.QueryUser(accessToken)
+	log.Println(user.Id)
+	http.Redirect(w, r, "/grwelcome" + "?" + "grusername=" + user.Name + "&gruserid=" + user.Id, http.StatusTemporaryRedirect)
+
 }
 
 
@@ -194,6 +240,7 @@ func getBooks() ([]Book, error) {
 	}
 	return books, nil
 }
+
 func indexHandler(w http.ResponseWriter, req *http.Request) {
 	log.Println("Inside ih")
 	var empty []string

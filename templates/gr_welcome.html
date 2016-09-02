@@ -18,12 +18,10 @@
       </nav>
       
       <div class="page-header">
-        <h3>Take the quiz <small>and discover your next read</small></h3>
-      </div>
+        <h3>Welcome {{.GRUsername}} from Goodreads</h3>
+      </DIV>
 
-      <a class="btn btn-primary" href="/quiz" role="button">Take the Quiz!</a>
-      <a class="btn btn-primary" href="/grauth" role="button">Authenticate with goodreads</a>
-      
+      <a class="btn btn-primary" href="/grlist?grusername={{.GRUsername}}&gruserid={{.GRUserid}}" role="button">Get the latest books you reviewed</a>
     </div>
   </body>
 </html>

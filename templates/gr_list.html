@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">  
+    <title>WhatBook</title>
+    <meta name="description" content="What book should I read?">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  </head>
+  <body>
+    <div class="col-md-8 col-md-offset-2">
+      <nav role="navbar" class="navbar navbar-default">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">                
+            <span class="glyphicon glyphicon-book" aria-hidden="true"></span> WhatBook</a>
+        </div>
+      </nav>
+      
+      <div class="page-header">
+        <h3>Your list</h3>
+      </div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cover</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Your Rating</th>
+            <th>Avg. Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range $index, $review := .GRReviews }}
+          <tr>
+            <th scope="row">{{ $index }}</th>
+            <td><img src="{{$review.GRBook.ImageURL}}" alt="{{$review.GRBook.Title}}" height="75" width="50"></td>
+            <td>{{$review.GRBook.Title}}</td>
+            <td>{{(index $review.GRBook.GRAuthors 0).Name}}</td>
+            <td>{{$review.Rating}}</td>
+            <th>{{$review.GRBook.AvgRating}}</th>
+          </tr>
+          {{ end }}
+        </tbody>
+      </table>
+      
+    </div>
+  </body>
+</html>
